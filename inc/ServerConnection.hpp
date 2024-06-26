@@ -3,11 +3,6 @@
 #include "ServerStruct.hpp"
 #include "log.hpp"
 #include <arpa/inet.h> //to convert ip into string
-#include <cstring>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <unistd.h>
 #include <vector>
 
 #define BACKLOG 10

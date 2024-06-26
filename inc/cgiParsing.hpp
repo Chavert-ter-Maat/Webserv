@@ -8,25 +8,28 @@
 // REFERENCE :( chapter 4:
 // http://www.faqs.org/rfcs/rfc3875.html
 
-class CgiParsing {
-private:
-  std::vector<std::string> meta_variables; // envpp;	// meta variables and
-                                           // header variables and shiznitz
-  std::vector<std::string> uri;            // argv;		// 4.4 The Script
-                                           // Command Line
-  std::vector<const char *> return_uri;
-  std::string body; // stdin;	//body should go here unless otherwise defined.
-  std::vector<std::string> customizable_variables_names; // accepted post_fixes
+class cgiParsing {
+	private:
+		std::vector<std::string> _metaVars; // envpp;	// meta variables and
+		std::vector<char *> _argv;
+		std::vector<char *> _envp;
+
+  std::vector<std::string> _uri;            // argv;		// 4.4 The Script
+  std::vector<const char *> _returnUri;
+  std::string _body; // stdin;	//body should go here unless otherwise defined.
+  std::vector<std::string> _customVarNames; // accepted post_fixes
+
   bool add_to_envpp(std::string name, std::string value, std::string additive);
   bool add_to_uri(std::string name, std::string value, std::string additive);
   bool dismantle_body(std::string body, std::string boundary);
+  bool validate_key(std::string key, std::vector<std::string> customVarNames);
 
 public:
-  CgiParsing(std::unordered_map<std::string, std::string> headers,
+  cgiParsing(std::unordered_map<std::string, std::string> headers,
              char **environ, std::shared_ptr<Request> _request,
              const std::string &path,
              const std::string &interpreter); // ServerStruct &serverinfo
-  ~CgiParsing(void);
+  ~cgiParsing(void);
   // char	**get_envpp();
   std::vector<std::string> &get_argv();
   std::vector<std::string> &get_envp();

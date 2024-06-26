@@ -53,7 +53,7 @@ private:
   std::unordered_map<std::string, std::string> _cgiEnv;
 
   void parseRequest();
-  std::vector<std::string> parse_requestArgs(const std::string uri);
+  std::vector<std::string> parseUriArgs(const std::string uri);
   bool parseRequestLine(const std::string &line);
   bool parseRequestHeaders(std::istringstream &requestStream);
   bool parseRequestBody(const std::string &_rawRequest);

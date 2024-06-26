@@ -1,34 +1,34 @@
 #pragma once
 
 #include "request.hpp"
+#include <filesystem>
 #include <memory>
+#include <vector>
 
-class cgi {
-public:
-  cgi();
-  cgi(const std::string &contentType);
-  cgi(const std::string &contentType, const std::string &title);
-  ~cgi();
+class cgi
+{
+  public:
+	cgi();
+	cgi(std::shared_ptr<Request> request,
+		 std::string interpreter,
+		 std::filesystem::path path);
+	~cgi();
 
-  std::string get_header(const std::string &content_type);
-  std::string get_start_html(const std::string &title);
-  std::string get_end_html();
+	void createArgs(std::vector<char *> &argv, std::string &path,
+		std::string &args);
 
-  void set_header(const std::string &content_type);
-  void set_title(const std::string &title);
+	std::vector<char *> createEnv(std::string, std::string value,
+		std::string additive);
 
-  std::string get_contentType() const { return _contentType; }
-  std::string get_title() const { return _title; }
+	std::string executeCGI(const std::string &args);
 
-  void createArgs(std::vector<char *> &argv, std::string &path,
-                  std::string &args);
-  // void createEnv(std::vector<char *> &envp);
+	std::vector<char *> &get_argv();
+	std::vector<char *> &get_envp();
 
-  std::string executeCGI(const std::string &path, const std::string &args,
-                         std::shared_ptr<Request> _request,
-                         std::string interpreter);
-
-private:
-  std::string _contentType;
-  std::string _title;
+  private:
+	std::shared_ptr<Request> _request;
+	std::string _interpreter;
+	std::filesystem::path _path;
+	std::vector<char *> _argv;
+	std::vector<char *> _envp;
 };

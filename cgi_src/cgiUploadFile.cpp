@@ -66,26 +66,32 @@ int main() {
   std::cout << "Content-type: text/html\r\n\r\n";
   std::cout << "<html><body>";
 
-  std::string contentType = std::getenv("CONTENT_TYPE");
+  // std::string contentType = std::getenv("CONTENT-TYPE");
+  // std::string host = std::getenv("HOST");
   std::string boundary = std::getenv("BOUNDARY");
 
-  if (!contentType.empty() &&
-      std::strstr(contentType.c_str(), "multipart/form-data") != nullptr) {
-    // std::string boundaryStart = std::strstr(contentType.c_str(),
-    // "boundary=");
-    if (!boundary.empty()) {
-      // std::string boundary = "--";
-      // boundary += (boundaryStart.c_str() + 9);
-      std::cout << "Boundary= " << boundary << std::endl;
-      parseMultipartFormData(boundary);
-      std::cout << "<h2>File uploaded successfully!</h2>";
-    } else {
-      std::cout << "<h2>Error: No boundary found in multipart/form-data</h2>";
-    }
-  } else {
-    std::cout << "<h2>Error: Invalid content type. Expected "
-                 "multipart/form-data.</h2>";
-  }
+  // std::cout << "Content Type" << contentType << std::endl;
+  std::cout << "Boundary: " << boundary << std::endl;
+  // std::cout << "Host: " << host << std::endl;
+
+  // if (!contentType.empty() &&
+  //     std::strstr(contentType.c_str(), "multipart/form-data") != nullptr) {
+  //   // std::string boundaryStart = std::strstr(contentType.c_str(),
+  //   // "boundary=");
+  //   if (!boundary.empty()) {
+  //     // std::string boundary = "--";
+  //     // boundary += (boundaryStart.c_str() + 9);
+  //     std::cout << "Boundary= " << boundary << std::endl;
+  //     parseMultipartFormData(boundary);
+  //     std::cout << "<h2>File uploaded successfully!</h2>";
+  //   } else {
+  //     std::cout << "<h2>Error: No boundary found in
+  //     multipart/form-data</h2>";
+  //   }
+  // } else {
+  //   std::cout << "<h2>Error: Invalid content type. Expected "
+  //                "multipart/form-data.</h2>";
+  // }
 
   std::cout << "</body></html>";
   return 0;

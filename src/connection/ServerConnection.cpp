@@ -1,5 +1,5 @@
 #include "ServerConnection.hpp"
-#include "log.hpp"
+#include <unistd.h>
 
 ServerConnection::ServerConnection() {}
 
