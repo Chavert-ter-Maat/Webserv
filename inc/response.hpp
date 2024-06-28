@@ -1,6 +1,7 @@
 #pragma once
 
 #include "request.hpp"
+#include "FileAcces.hpp"
 #include <iostream>
 #include <memory>
 #include <unordered_map>
@@ -34,20 +35,19 @@ enum class StatusCode
 	GATEWAY_TIMEOUT = 504
 };
 
-class Response
-{
-  public:
-	Response();
-	Response(std::shared_ptr<Request> request);
-	~Response();
+class Response {
+public:
+  Response();
+  Response(std::shared_ptr<Request> request, ServerStruct &config);
+  ~Response();
 
 	Response(const Response &src);
 	Response &operator=(const Response &rhs);
 	void swap(Response &lhs);
 
 	void handleRequest();
-	std::string get_response();
-	std::string get_contentType();
+	std::string getResponse();
+	std::string getContentType();
 	std::string getBody();
 
 	void printResponse();
@@ -58,6 +58,8 @@ class Response
 	std::string _contentType;
 	std::string _body;
 	bool _isCGI;
+  	ServerStruct	&_config;
+  	FileAcces		_security;
 
 	bool handleGetRequest();
 	bool handlePostRequest();

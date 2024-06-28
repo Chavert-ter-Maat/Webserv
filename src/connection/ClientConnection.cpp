@@ -1,6 +1,7 @@
 #include "ClientConnection.hpp"
 #include "request.hpp"
 #include "response.hpp"
+#include "signals.hpp"
 #include <memory>
 
 ClientConnection::ClientConnection() {}
@@ -69,7 +70,7 @@ void ClientConnection::handleInputEvent(int index) {
   // _connectedClients[connectedClientFD].keepAlive =
   // request.parseRequest(_connectedClients[getIndexByClientFD(index)]); // Fix
   // the error by using getIndexByClientFD(index) instead of connectedClientFD
-  Response response(request);
+  Response response(request, ptrServerConnection->_config);
 
   const std::string httpResponse =
       response.get_response(); //"here is the response from the server\n";
@@ -128,7 +129,7 @@ void ClientConnection::acceptClients(int serverFD) {
   int clientFD =
       accept(serverFD, (struct sockaddr *)&clientAddr, &clientAddrLen);
   if (clientFD == -1) {
-    logError("Failed to connect on server socket");
+    logError("Failed to connect on server");
     return;
   }
   if (getpeername(clientFD, (struct sockaddr *)&clientAddr, &clientAddrLen) !=
@@ -207,9 +208,14 @@ void ClientConnection::setUpClientConnection() {
           // i--;
         }
       }
-    } else if (poll_count == 0)
+    } 
+    else if (poll_count == 0)
       continue;
+    else if (globalSignalReceived == 1) {
+		  logAdd("Signal received, closing server connection");
+		  break;
+   }
     else
       logError("Failed to poll");
-  }
+	}
 }

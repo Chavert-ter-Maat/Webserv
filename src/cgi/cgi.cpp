@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <vector>
+#include <unistd.h>
 
 // REFERENCE :( chapter 4:
 // http://www.faqs.org/rfcs/rfc3875.html

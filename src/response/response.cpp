@@ -37,6 +37,7 @@ Response &Response::operator=(const Response &rhs)
 	return (*this);
 }
 
+<<<<<<< HEAD
 void Response::swap(Response &lhs)
 {
 	std::swap(_request, lhs._request);
@@ -66,18 +67,38 @@ void Response::handleRequest()
 		buildResponse(static_cast<int>(StatusCode::INTERNAL_SERVER_ERROR),
 			"Internal Server Error", "");
 	}
-}
+
+/* void Response::handleRequest() {
+	int		return_code = 0;
+  std::string request_method = request->get_requestMethod();
+  try {
+	request_path = security.isFilePermissioned(request->get_uri(), return_code);
+	if (return_code)
+		request_path = security.getErrorPage(return_code); // wrong place
+	std::cout << "\nPATH:" << request_path << std::endl;
+    if (request_method == "GET")
+      handleGetRequest(request);
+    else if (request_method == "POST")
+      handlePostRequest(request);
+    else if (request_method == "DELETE")
+      handleDeleteRequest(request);
+    else
+      buildResponse(static_cast<int>(StatusCode::METHOD_NOT_ALLOWED),
+                    "Method Not Allowed", "");
+  } catch (const std::exception &e) {
+    buildResponse(static_cast<int>(StatusCode::INTERNAL_SERVER_ERROR),
+                  "Internal Server Error", "");
+  }
+} */
 
 bool Response::handleGetRequest()
 {
 	std::stringstream buffer;
-	std::filesystem::path path = "html/";
-	std::filesystem::path resourcePath = _request->get_uri();
+	std::filesysm::path path = "html/";
+	// std::filesystem::path resourcePath = _request->get_uri();
 
-	if (resourcePath.empty() || resourcePath == "/")
-		resourcePath = "index.html";
 
-	if (!resourcePath.empty() && resourcePath.has_extension())
+	if (!request->getPath.empty() && resourcePath.has_extension())
 	{
 		auto it = _contentTypes.find(resourcePath.extension());
 		if (it == _contentTypes.end())
@@ -89,7 +110,7 @@ bool Response::handleGetRequest()
 		_contentType = it->second;
 		if (_interpreters.find(resourcePath.extension()) == _interpreters.end())
 		{
-			path.append(resourcePath.string());
+			// path.append(resourcePath.string());
 			std::ifstream file(path, std::ios::binary);
 			if (!file)
 			{
@@ -103,14 +124,14 @@ bool Response::handleGetRequest()
 		else
 		{
 			_isCGI = true;
-			path.append(resourcePath.string());
+			// path.append(resourcePath.string());
 			cgi CGI(_request, _interpreters.at(resourcePath.extension()), path);
 			_body = CGI.executeCGI();
 		}
 	}
 	else // dir listing on?
 	{
-		path.append(resourcePath.string());
+		// path.append(resourcePath.string());
 		_body = list_dir(path, _request->get_uri(), _request->get_referer());
 	}
 	_responseString = buildResponse(static_cast<int>(StatusCode::OK), "OK",

@@ -54,90 +54,93 @@ std::string Log::getTimeStamp()
 }
 
 // General log functions
-void Log::logError(const std::string &message)
-{
-	if (_logFile.is_open())
-	{
-		_logFile << getTimeStamp() << " [error] " << message << std::endl;
-		_logFile.flush();
-	}
-	else
-	{
-		std::cerr << getTimeStamp() << " [error] Unable to write to error log file" << std::endl;
-	}
+void Log::logAdd(const std::string &message) {
+  if (_logFile.is_open()) {
+    _logFile << getTimeStamp() << " [info]  " << message << std::endl;
+    _logFile.flush();
+  } 
+  else {
+    std::cerr << getTimeStamp() << " [error] Unable to write to error log file"
+              << std::endl;
+  }
+}
+
+void Log::logError(const std::string &message) {
+  if (_logFile.is_open()) {
+    _logFile << getTimeStamp() << " [error] " << message << std::endl;
+    _logFile.flush();
+  } 
+  else {
+    std::cerr << getTimeStamp() << " [error] Unable to write to error log file"
+              << std::endl;
+  }
 }
 
 // Client connection log functions
 void Log::logClientError(const std::string &message, char *clientIP,
-	int clientFD)
-{
-	if (_logFile.is_open())
-	{
-		_logFile << getTimeStamp() << " [error] "
-					<< "Client IP " << clientIP << " " << message << " on socket " << clientFD << std::endl;
-		_logFile.flush();
-	}
-	else
-	{
-		std::cerr << getTimeStamp() << " [error] Unable to write to error log file" << std::endl;
-	}
+                         int clientFD) {
+  if (_logFile.is_open()) {
+    _logFile << getTimeStamp() << " [error] " << "Client IP " << clientIP << " "
+             << message << " on socket " << clientFD << std::endl;
+    _logFile.flush();
+  } 
+  else {
+    std::cerr << getTimeStamp() << " [error] Unable to write to error log file"
+              << std::endl;
+  }
 }
 
 void Log::logClientConnection(const std::string &message, std::string clientIP,
-	int clientFD)
-{
-	if (_logFile.is_open())
-	{
-		_logFile << getTimeStamp() << " [info]  "
-					<< "Client IP " << clientIP << " " << message << " on socket " << clientFD << std::endl;
-		_logFile.flush();
-	}
-	else
-	{
-		std::cerr << getTimeStamp() << " [error] Unable to write to access log file" << std::endl;
-	}
+                              int clientFD) {
+  if (_logFile.is_open()) {
+    _logFile << getTimeStamp() << " [info]  " << "Client IP " << clientIP << " "
+             << message << " on socket " << clientFD << std::endl;
+    _logFile.flush();
+  } 
+  else {
+    std::cerr << getTimeStamp() << " [error] Unable to write to access log file"
+              << std::endl;
+  }
 }
 
 // Server connection log functions
 void Log::logServerError(const std::string &message,
-	const std::string &serverName, int port)
-{
-	if (_logFile.is_open())
-	{
-		_logFile << getTimeStamp() << " [error] " << message << " on server " << serverName << "on port " << port << std::endl;
-		_logFile.flush();
-	}
-	else
-	{
-		std::cerr << getTimeStamp() << " [error] Unable to write to error log file" << std::endl;
-	}
+                         const std::string &serverName, int port) {
+  if (_logFile.is_open()) {
+    _logFile << getTimeStamp() << " [error] " << message << " on server "
+             << serverName << "on port " << port << std::endl;
+    _logFile.flush();
+  } 
+  else {
+    std::cerr << getTimeStamp() << " [error] Unable to write to error log file"
+              << std::endl;
+  }
 }
 
 void Log::logServerConnection(const std::string &message,
-	const std::string &serverName, int socket, int port)
-{
-	if (_logFile.is_open())
-	{
-		_logFile << getTimeStamp() << " [info]  " << message << " " << serverName << "on socket " << socket << " is now listening on port " << port << std::endl;
-		_logFile.flush();
-	}
-	else
-	{
-		std::cerr << getTimeStamp() << " [error] Unable to write to access log file" << std::endl;
-	}
+                              const std::string &serverName, int socket,
+                              int port) {
+  if (_logFile.is_open()) {
+    _logFile << getTimeStamp() << " [info]  " << message << " " << serverName
+             << "on socket " << socket << " listening on port " << port
+             << std::endl;
+    _logFile.flush();
+  } 
+  else {
+    std::cerr << getTimeStamp() << " [error] Unable to write to access log file"
+              << std::endl;
+  }
 }
 
 // Response log functions
-void Log::logResponse(int status, const std::string &message)
-{
-	if (_logFile.is_open())
-	{
-		_logFile << getTimeStamp() << " [response] "
-					<< " Statuscode " << status << "  " << message << " has been send to client" << std::endl;
-		_logFile.flush();
-	}
-	else
-	{
-		std::cerr << getTimeStamp() << " [error] Unable to write to access log file" << std::endl;
-	}
+void Log::logResponse(int status, const std::string &message) {
+  if (_logFile.is_open()) {
+    _logFile << getTimeStamp() << " [response] " << " Statuscode " << status
+             << "  " << message << " has been send to client" << std::endl;
+    _logFile.flush();
+  } 
+  else {
+    std::cerr << getTimeStamp() << " [error] Unable to write to access log file"
+              << std::endl;
+  }
 }
