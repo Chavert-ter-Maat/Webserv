@@ -10,9 +10,8 @@
 
 class cgiParsing {
 	private:
-		std::vector<std::string> _metaVars; // envpp;	// meta variables and
+		std::vector<std::string> _envp; // envpp;	// meta variables and
 		std::vector<char *> _argv;
-		std::vector<char *> _envp;
 
   std::vector<std::string> _uri;            // argv;		// 4.4 The Script
   std::vector<const char *> _returnUri;

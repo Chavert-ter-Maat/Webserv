@@ -71,6 +71,7 @@ void Request::parseRequest()
 	std::string line;
 	std::string headerKey;
 	std::string headerValue;
+
 	if (_rawRequest.empty())
 	{
 		_isValid = false;
@@ -84,13 +85,16 @@ void Request::parseRequest()
 		_isValid = false;
 		return ;
 	}
-	_uri = trim(_uri, "/");
-	_requestArgs = parseUriArgs(_uri);
 	if (!parseRequestHeaders(requestStream))
 	{
 		_isValid = false;
 		return ;
 	}
+	_uri = trim(_uri, "/");
+	if (_requestMethod == "GET" )
+		_requestArgs = parseUriArgs(_uri);
+	if (_requestMethod == "POST")
+		_boundary = get_boundary();
 	parseRequestBody(_rawRequest);
 	if (_headers.find("connection") != _headers.end())
 	{

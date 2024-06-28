@@ -51,6 +51,7 @@ private:
   std::string _body;
   bool _isValid;
   std::unordered_map<std::string, std::string> _cgiEnv;
+  std::string _boundary;
 
   void parseRequest();
   std::vector<std::string> parseUriArgs(const std::string uri);

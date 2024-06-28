@@ -12,21 +12,21 @@
 #define KEEP_ALIVE_N 100
 const std::string UPLOAD_DIR = "./html/uploads/";
 
-Response::Response() : _request(nullptr), _responseString("")
+Response::Response() : _request(nullptr), _responseString(""), _contentType(""), _body(""), _isCGI(false)
 {
 }
 
 Response::Response(std::shared_ptr<Request> request) : _request(request),
-	_responseString(""), _contentType("")
+	_responseString(""), _contentType(""), _body(""), _isCGI(false)
 {
-	handleRequest(request);
+	handleRequest();
 	printResponse();
 }
 
 Response::~Response(){};
 
 Response::Response(const Response &src) : _request(src._request),
-	_responseString(src._responseString), _contentType(src._contentType)
+	_responseString(src._responseString), _contentType(src._contentType), _body(src._body), _isCGI(src._isCGI)
 {
 }
 
@@ -42,19 +42,21 @@ void Response::swap(Response &lhs)
 	std::swap(_request, lhs._request);
 	std::swap(_responseString, lhs._responseString);
 	std::swap(_contentType, lhs._contentType);
+	std::swap(_body, lhs._body);
+	std::swap(_isCGI, lhs._isCGI);
 }
 
-void Response::handleRequest(const std::shared_ptr<Request> &request)
+void Response::handleRequest()
 {
-	std::string request_method = request->get_requestMethod();
+	std::string request_method = _request->get_requestMethod();
 	try
 	{
 		if (request_method == "GET")
-			handleGetRequest(request);
+			handleGetRequest();
 		else if (request_method == "POST")
-			handlePostRequest(request);
+			handlePostRequest();
 		else if (request_method == "DELETE")
-			handleDeleteRequest(request);
+			handleDeleteRequest();
 		else
 			buildResponse(static_cast<int>(StatusCode::METHOD_NOT_ALLOWED),
 				"Method Not Allowed", "");
@@ -66,31 +68,26 @@ void Response::handleRequest(const std::shared_ptr<Request> &request)
 	}
 }
 
-bool Response::handleGetRequest(const std::shared_ptr<Request> &request)
+bool Response::handleGetRequest()
 {
-	bool	isCGI = false;
-	std::string body;
 	std::stringstream buffer;
 	std::filesystem::path path = "html/";
-	std::filesystem::path resourcePath = request->get_uri();
+	std::filesystem::path resourcePath = _request->get_uri();
 
 	if (resourcePath.empty() || resourcePath == "/")
-	{
 		resourcePath = "index.html";
-	}
 
 	if (!resourcePath.empty() && resourcePath.has_extension())
 	{
-		std::unordered_map<std::string,
-			std::string>::const_iterator res = contentTypes.find(resourcePath.extension());
-		if (res == contentTypes.end())
+		auto it = _contentTypes.find(resourcePath.extension());
+		if (it == _contentTypes.end())
 		{
 			_responseString = buildResponse(static_cast<int>(StatusCode::UNSUPPORTED_MEDIA_TYPE),
 					"Unsupported Media Type", "");
 			return (false);
 		}
-		_contentType = res->second;
-		if (interpreters.find(resourcePath.extension()) == interpreters.end())
+		_contentType = it->second;
+		if (_interpreters.find(resourcePath.extension()) == _interpreters.end())
 		{
 			path.append(resourcePath.string());
 			std::ifstream file(path, std::ios::binary);
@@ -101,36 +98,32 @@ bool Response::handleGetRequest(const std::shared_ptr<Request> &request)
 				return (false);
 			}
 			buffer << file.rdbuf();
-			body = buffer.str();
+			_body = buffer.str();
 		}
 		else
 		{
-			isCGI = true;
-			// path.append("cgi-bin/"); path.append("php-bin/");?
+			_isCGI = true;
 			path.append(resourcePath.string());
-			cgi CGI(_contentType);
-			body = CGI.executeCGI(path, "", _request,
-					interpreters.at(resourcePath.extension()));
+			cgi CGI(_request, _interpreters.at(resourcePath.extension()), path);
+			_body = CGI.executeCGI();
 		}
 	}
-	else // else if (true)? // dir listing on off
+	else // dir listing on?
 	{
 		path.append(resourcePath.string());
-		body = list_dir(path, request->get_uri(), request->get_referer());
+		_body = list_dir(path, _request->get_uri(), _request->get_referer());
 	}
 	_responseString = buildResponse(static_cast<int>(StatusCode::OK), "OK",
-			body, isCGI);
+			_body, _isCGI);
 	return (true);
 }
 
-bool Response::handlePostRequest(const std::shared_ptr<Request> &request)
+bool Response::handlePostRequest()
 {
-	bool	isCGI = false;
-	std::string requestBody = request->get_body();
-	std::string requestContentType = request->get_contentType();
-	std::filesystem::path path = "./html/";
-	std::filesystem::path resourcePath = request->get_uri();
-	std::string body;
+	std::string requestBody = _request->get_body();
+	std::string requestContentType = _request->get_contentType();
+	std::filesystem::path resourcePath = _request->get_uri();
+	std::filesystem::path path = "html/";
 
 	if (!resourcePath.empty() && resourcePath.string()[0] == '/')
 		resourcePath = resourcePath.string().substr(1);
@@ -139,14 +132,12 @@ bool Response::handlePostRequest(const std::shared_ptr<Request> &request)
 	std::cout << "ReourcePath:" << resourcePath << std::endl;
 	if (resourcePath.has_extension())
 	{
-		if (interpreters.find(resourcePath.extension()) != interpreters.end())
+		if (_interpreters.find(resourcePath.extension()) != _interpreters.end())
 		{
-			isCGI = true;
-			// path.append("php-bin/");
+			_isCGI = true;
 			path.append(resourcePath.string());
-			cgi CGI(_contentType);
-			body = CGI.executeCGI(path, "", _request,
-					interpreters.at(resourcePath.extension()));
+			cgi CGI(_request, _interpreters.at(resourcePath.extension()), path);
+			_body = CGI.executeCGI();
 		}
 		else
 		{
@@ -160,7 +151,7 @@ bool Response::handlePostRequest(const std::shared_ptr<Request> &request)
 		handle_multipart();
 		return (true);
 	}
-	buildResponse(static_cast<int>(StatusCode::OK), "OK", body, isCGI);
+	buildResponse(static_cast<int>(StatusCode::OK), "OK", _body, _isCGI);
 	return (true);
 }
 
@@ -224,10 +215,10 @@ void Response::handle_multipart()
 	}
 }
 
-bool Response::handleDeleteRequest(const std::shared_ptr<Request> &request)
+bool Response::handleDeleteRequest()
 {
-	std::filesystem::path Path = request->get_uri();
-	buildResponse(static_cast<int>(StatusCode::OK), "OK", request->get_body());
+	std::filesystem::path path = _request->get_uri();
+	buildResponse(static_cast<int>(StatusCode::OK), "OK", _request->get_body());
 	return (true);
 }
 

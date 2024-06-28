@@ -45,9 +45,10 @@ class Response
 	Response &operator=(const Response &rhs);
 	void swap(Response &lhs);
 
-	void handleRequest(const std::shared_ptr<Request> &request);
+	void handleRequest();
 	std::string get_response();
 	std::string get_contentType();
+	std::string getBody();
 
 	void printResponse();
 
@@ -55,10 +56,12 @@ class Response
 	std::shared_ptr<Request> _request;
 	std::string _responseString;
 	std::string _contentType;
+	std::string _body;
+	bool _isCGI;
 
-	bool handleGetRequest(const std::shared_ptr<Request> &request);
-	bool handlePostRequest(const std::shared_ptr<Request> &request);
-	bool handleDeleteRequest(const std::shared_ptr<Request> &request);
+	bool handleGetRequest();
+	bool handlePostRequest();
+	bool handleDeleteRequest();
 
 	void handle_multipart();
 	std::unordered_map<std::string,
@@ -70,7 +73,7 @@ class Response
 		const std::string &body, bool isCGI = false);
 
 	static const inline std::unordered_map<std::string,
-		std::string> contentTypes{{".html", "text/html"},
+		std::string> _contentTypes{{".html", "text/html"},
 																					{".txt",
 																						"text/plain"},
 
@@ -96,6 +99,6 @@ class Response
 																						"multipart/form-data"}};
 
 	static const inline std::unordered_map<std::string,
-		std::string> interpreters{{".cgi", ""}, {".py", "/usr/bin/python3"},
+		std::string> _interpreters{{".cgi", ""}, {".py", "/usr/bin/python3"},
 		{".php", "/usr/lib/cgi-bin/php"}};
 };
